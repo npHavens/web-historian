@@ -16,6 +16,12 @@ exports.handleRequest = function (req, res) {
     }
 
     if (req.url === '/www.google.com') {
+      // check if URL is in the list - 200 ms
+      // check to see if URL is archieved - 1 second
+      // if it is there... then return the contents.
+      // if it is not there... return and error.
+      // What if it is partially there?
+
       //console.log('hitting request for googl');
       asset = archive.paths.archivedSites + req.url;
       helpers.serveAssets(res, asset);
@@ -27,15 +33,38 @@ exports.handleRequest = function (req, res) {
   }
 
   if (req.method === 'POST') {
-    //get data from request object
-    //on('data')
-    //console.log('handling POST request');
     req.on('data', function(data) {
       var string = data + '';
-      archive.addUrlToList(string.split('=')[1], function(result) {
-        res.writeHead(302, helpers.headers);
-        res.end();
+      // check if URL is in the list and //"downloaded"
+      archive.isUrlInList(string, function(isInList, ind) {
+        console.log(ind);
+        if (isInList) {
+          // need to handle -1 *******
+          archive.readListOfUrls(function(arr) {
+            if (arr[ind].split(': ')[1] === 'true') {
+              asset = archive.paths.archivedSites + string;
+              helpers.serveAssets(res, asset);
+            } else {
+              asset = './web/public/loading.html';
+              helpers.serveAssets(res, asset);
+            }
+          });
+        } else {
+          archive.addUrlToList(string.split('=')[1], function(result) {
+            console.log('post request', string);
+            res.writeHead(302, helpers.headers);
+            res.end();
+          });
+        }
       });
+      // if yes return data serve asset
+      // if not show loading page.
+
+
+
+
+
+
     });
 
 

@@ -1,6 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var _ = require('underscore');
+var request = require('request');
 
 /*
  * You will need to reuse the same paths many times over in the course of this sprint.
@@ -39,16 +40,20 @@ exports.isUrlInList = function(url, callback) {
     if (err) {
       throw err;
     }
-    if (content.split('\n').indexOf(url) > -1) {
-      callback(true);
+    var cleanString = content.replace(/\: true/g, '').replace(/\: false/g, '');
+    console.log(cleanString);
+    var ind = cleanString.split('\n').indexOf(url);
+    if (ind > -1) {
+      callback(true, ind);
     } else {
-      callback(false);
+      callback(false, -1);
     }
   });
 };
 
 exports.addUrlToList = function(url, callback) {
-  fs.appendFile(exports.paths.list, url + '\n', function (err) {
+
+  fs.appendFile(exports.paths.list, url + ': false' + '\n', function (err) {
     //console.log('url:', url)
     if (err) {
       console.log('error');
@@ -77,11 +82,16 @@ exports.downloadUrls = function(urls) {
   urls.forEach(function(url) {
     exports.isUrlArchived(url, function(isArchived) {
       if (!isArchived) {
-        fs.writeFile(exports.paths.archivedSites +'/' + url, 'utf8', function (err) {
-          if (err) {
-            throw err;
-          }
-         //console.log('writing file');
+        // use the request module
+        // use HTML as 3rd arguement
+        request('http://' + url, function(err, res, html) {
+          fs.writeFile(exports.paths.archivedSites + '/' + url, html, function (err) {
+            if (err) {
+              throw err;
+            } else {
+              console.log('success! I wrote the HTML!');
+            }
+          });
         });
       }
     });
