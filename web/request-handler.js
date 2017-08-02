@@ -3,6 +3,7 @@ var archive = require('../helpers/archive-helpers');
 // require more modules/folders here!
 var helpers = require('./http-helpers');
 var fs = require('fs');
+var fetcher = require('../workers/htmlfetcher');
 
 exports.handleRequest = function (req, res) {
   //console.log(req.method);
@@ -33,43 +34,32 @@ exports.handleRequest = function (req, res) {
   }
 
   if (req.method === 'POST') {
+
     req.on('data', function(data) {
-      var string = data + '';
+      var string = (data + '').split('=')[1];
+      console.log(string);
       // check if URL is in the list and //"downloaded"
       archive.isUrlInList(string, function(isInList, ind) {
-        console.log(ind);
         if (isInList) {
-          // need to handle -1 *******
           archive.readListOfUrls(function(arr) {
             if (arr[ind].split(': ')[1] === 'true') {
-              asset = archive.paths.archivedSites + string;
+              asset = archive.paths.archivedSites + '/' + string;
               helpers.serveAssets(res, asset);
+              // URL is not in list yet
             } else {
               asset = './web/public/loading.html';
               helpers.serveAssets(res, asset);
             }
           });
         } else {
-          archive.addUrlToList(string.split('=')[1], function(result) {
+          archive.addUrlToList(string, function(result) {
             console.log('post request', string);
             res.writeHead(302, helpers.headers);
-            res.end();
+            asset = './web/public/loading.html';
+            helpers.serveAssets(res, asset);
           });
         }
       });
-      // if yes return data serve asset
-      // if not show loading page.
-
-
-
-
-
-
     });
-
-
   }
-
-
-
 };

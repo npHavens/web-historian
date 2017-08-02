@@ -64,7 +64,7 @@ describe('server', function() {
           .type('form')
           .send({ url: url })
           .expect(302, function (err) {
-             //console.log('hitting expect')
+          //console.log('hitting expect')
             if (!err) {
               var fileContents = fs.readFileSync(archive.paths.list, 'utf8');
               //console.log(fileContents)

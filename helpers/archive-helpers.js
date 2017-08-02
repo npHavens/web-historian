@@ -80,21 +80,29 @@ exports.isUrlArchived = function(url, callback) {
 exports.downloadUrls = function(urls) {
   //get url list
   urls.forEach(function(url) {
-    exports.isUrlArchived(url, function(isArchived) {
-      if (!isArchived) {
-        // use the request module
-        // use HTML as 3rd arguement
-        request('http://' + url, function(err, res, html) {
-          fs.writeFile(exports.paths.archivedSites + '/' + url, html, function (err) {
+  /*    exports.isUrlArchived(url, function(isArchived) {
+        if (!isArchived) {*/
+    // use the request module
+    // use HTML as 3rd arguement
+    request('http://' + url, function(err, res, html) {
+      fs.writeFile(exports.paths.archivedSites + '/' + url, html, function (err) {
+        if (err) {
+          throw err;
+        } else {
+          fs.appendFile(exports.paths.list, url + ': true' + '\n', function (err) {
+          //console.log('url:', url)
             if (err) {
+              console.log('error');
               throw err;
-            } else {
-              console.log('success! I wrote the HTML!');
             }
+            console.log(url + ' was written back into the log');
           });
-        });
-      }
+          console.log('success! I wrote the HTML!');
+        }
+      });
     });
+    /*      }
+      });*/
   });
   //get file list
   //make download list
