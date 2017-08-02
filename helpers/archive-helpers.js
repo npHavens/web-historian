@@ -2,6 +2,7 @@ var fs = require('fs');
 var path = require('path');
 var _ = require('underscore');
 var request = require('request');
+var Promise = require('bluebird');
 
 /*
  * You will need to reuse the same paths many times over in the course of this sprint.
@@ -26,40 +27,44 @@ exports.initialize = function(pathsObj) {
 // The following function names are provided to you to suggest how you might
 // modularize your code. Keep it clean!
 
-exports.readListOfUrls = function(callback) {
-  fs.readFile(exports.paths.list, 'utf8', function(err, content) {
-    if (err) {
-      throw err;
-    }
-    callback(content.split('\n'));
+exports.readListOfUrls = function() {
+  return new Promise(function(resolve, reject) {
+    fs.readFile(exports.paths.list, 'utf8', function(err, content) {
+      if (err) {
+        reject(err);
+      }
+      resolve(content.split('\n'));
+    });
   });
 };
 
-exports.isUrlInList = function(url, callback) {
-  fs.readFile(exports.paths.list, 'utf8', function(err, content) {
-    if (err) {
-      throw err;
-    }
-    var cleanString = content.replace(/\: true/g, '').replace(/\: false/g, '');
-    console.log(cleanString);
-    var ind = cleanString.split('\n').indexOf(url);
-    if (ind > -1) {
-      callback(true, ind);
-    } else {
-      callback(false, -1);
-    }
+exports.isUrlInList = function(url) {
+  return new Promise(function(resolve, reject) {
+    fs.readFile(exports.paths.list, 'utf8', function(err, content) {
+      if (err) {
+        reject(err);
+      }
+      var cleanString = content.replace(/\: true/g, '').replace(/\: false/g, '');
+      var ind = cleanString.split('\n').indexOf(url);
+      if (ind > -1) {
+        resolve(true, ind);
+      } else {
+        resolve(false, -1);
+      }
+    });
   });
 };
 
-exports.addUrlToList = function(url, callback) {
-
-  fs.appendFile(exports.paths.list, url + ': false' + '\n', function (err) {
-    //console.log('url:', url)
-    if (err) {
-      console.log('error');
-      throw err;
-    }
-    callback();
+exports.addUrlToList = function(url) {
+  return new Promise(function(resolve, reject) {
+    fs.appendFile(exports.paths.list, url + ': false' + '\n', function (err) {
+      //console.log('url:', url)
+      if (err) {
+        console.log('error');
+        reject(err);
+      }
+      resolve();
+    });
   });
 };
 

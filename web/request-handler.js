@@ -34,32 +34,34 @@ exports.handleRequest = function (req, res) {
   }
 
   if (req.method === 'POST') {
-
+    //req.on('data', function(data) {
+    //var string = (data + '').split('=')[1];
+    //   console.log(string);
+    //   // check if URL is in the list and //"downloaded"
+      //archive.isUrlInList(string, function(isInList, ind) {
+    //     if (isInList) {
+    //       archive.readListOfUrls(function(arr) {
+    //         if (arr[ind].split(': ')[1] === 'true') {
+    //           asset = archive.paths.archivedSites + '/' + string;
+    //           helpers.serveAssets(res, asset);
+    //           // URL is not in list yet
+    //         } else {
+    //           asset = './web/public/loading.html';
+    //           helpers.serveAssets(res, asset);
+    //         }
+    //       });
+    //     } else {
+    //       archive.addUrlToList(string, function(result) {
+    //         console.log('post request', string);
+    //         res.writeHead(302, helpers.headers);
+    //         asset = './web/public/loading.html';
+    //         helpers.serveAssets(res, asset);
+    //       });
+    //     }
+    //   });
+    //});
     req.on('data', function(data) {
-      var string = (data + '').split('=')[1];
-      console.log(string);
-      // check if URL is in the list and //"downloaded"
-      archive.isUrlInList(string, function(isInList, ind) {
-        if (isInList) {
-          archive.readListOfUrls(function(arr) {
-            if (arr[ind].split(': ')[1] === 'true') {
-              asset = archive.paths.archivedSites + '/' + string;
-              helpers.serveAssets(res, asset);
-              // URL is not in list yet
-            } else {
-              asset = './web/public/loading.html';
-              helpers.serveAssets(res, asset);
-            }
-          });
-        } else {
-          archive.addUrlToList(string, function(result) {
-            console.log('post request', string);
-            res.writeHead(302, helpers.headers);
-            asset = './web/public/loading.html';
-            helpers.serveAssets(res, asset);
-          });
-        }
-      });
+
     });
   }
 };
